@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>Keepsake</title>
+<style>
+  :root{
+    --bg-deep:#0a0e24;
+    --bg-deep2:#131a3a;
+    --ink:#f3efe6;
+    --ink-dim:#aab0d6;
+    --gold:#e3b872;
+    --gold-dim:rgba(227,184,114,0.25);
+    --paper:#f7f0e3;
+    --paper-shadow:rgba(10,10,30,0.55);
+    --danger:#e08a7a;
+    --glass:rgba(255,255,255,0.06);
+    --glass-border:rgba(255,255,255,0.14);
+    --font-display: Georgia, 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', serif;
+    --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;height:100%;}
+  body{
+    font-family:var(--font-body);
+    color:var(--ink);
+    background:var(--bg-deep);
+    min-height:100vh;
+    overflow-x:hidden;
+    -webkit-tap-highlight-color:transparent;
+  }
+  #stars{
+    position:fixed; inset:0; width:100%; height:100%;
+    background:radial-gradient(ellipse at 50% -10%, var(--bg-deep2), var(--bg-deep) 65%);
+    z-index:0;
+  }
+  .app{position:relative; z-index:1; min-height:100vh;}
+  h1,h2,h3{font-family:var(--font-display); font-weight:600; margin:0;}
+  ::selection{background:var(--gold-dim);}
+  button{font-family:inherit; cursor:pointer;}
+  input,textarea{font-family:inherit;}
+  a{color:var(--gold);}
+
+  .lock-wrap{min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px;}
+  .lock-card{
+    width:100%; max-width:360px;
+    background:var(--glass); border:1px solid var(--glass-border);
+    backdrop-filter:blur(14px); border-radius:20px;
+    padding:36px 28px 30px; text-align:center;
+    box-shadow:0 30px 60px rgba(0,0,0,0.35);
+  }
+  .lock-mark{font-size:15px; letter-spacing:0.02em; color:var(--gold); margin-bottom:6px; font-family:var(--font-display); font-style:italic;}
+  .lock-card h1{font-size:28px; margin-bottom:8px;}
+  .lock-sub{color:var(--ink-dim); font-size:14px; line-height:1.5; margin-bottom:26px;}
+  .field{margin-bottom:14px; text-align:left;}
+  .field label{display:block; font-size:12.5px; color:var(--ink-dim); margin-bottom:6px;}
+  .field input{
+    width:100%; padding:12px 14px; border-radius:11px;
+    border:1px solid var(--glass-border); background:rgba(255,255,255,0.05);
+    color:var(--ink); font-size:15px; outline:none;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .field input:focus{border-color:var(--gold); background:rgba(255,255,255,0.09);}
+  .btn-primary{
+    width:100%; padding:13px 14px; border-radius:11px; border:none;
+    background:var(--gold); color:#1a1408; font-weight:600; font-size:15px; margin-top:6px;
+  }
+  .btn-primary:active{transform:scale(0.98);}
+  .err-msg{color:var(--danger); font-size:13px; margin-top:12px; min-height:16px;}
+
+  header{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:18px 20px 10px; position:sticky; top:0; z-index:5;
+    background:linear-gradient(var(--bg-deep) 55%, transparent);
+  }
+  .wordmark{display:flex; flex-direction:column; line-height:1.1;}
+  .wordmark .lock-mark{margin:0;}
+  .wordmark h1{font-size:22px;}
+  .icon-btn{
+    width:38px; height:38px; border-radius:50%; border:1px solid var(--glass-border);
+    background:var(--glass); display:flex; align-items:center; justify-content:center;
+    color:var(--ink); flex-shrink:0;
+  }
+  .icon-btn:active{transform:scale(0.94);}
+  .header-actions{display:flex; gap:8px;}
+
+  .grid-wrap{padding:8px 14px 110px;}
+  .grid{column-count:1; column-gap:16px;}
+  @media(min-width:560px){.grid{column-count:2;}}
+  @media(min-width:900px){.grid{column-count:3;}}
+  @media(min-width:1250px){.grid{column-count:4;}}
+
+  .empty-state{text-align:center; padding:70px 20px; color:var(--ink-dim);}
+  .empty-state h2{color:var(--ink); font-size:22px; margin-bottom:8px;}
+  .empty-state p{font-size:14px; line-height:1.6; max-width:280px; margin:0 auto;}
+  .loading-state{text-align:center; padding:70px 20px; color:var(--ink-dim); font-size:14px;}
+
+  .card{
+    break-inside:avoid; margin-bottom:18px; display:block;
+    background:var(--paper); border-radius:3px 3px 2px 2px;
+    padding:10px 10px 14px; color:#2a2418;
+    box-shadow:0 10px 22px var(--paper-shadow);
+    transform:rotate(var(--tilt,0deg));
+    transition:transform .25s ease, box-shadow .25s ease;
+    cursor:pointer;
+  }
+  .card:nth-child(3n+1){--tilt:-1.4deg;}
+  .card:nth-child(3n+2){--tilt:1.1deg;}
+  .card:nth-child(3n){--tilt:-0.6deg;}
+  .card:active{transform:rotate(0deg) scale(0.98);}
+  .card:hover{transform:rotate(0deg); box-shadow:0 16px 30px var(--paper-shadow);}
+
+  .card-media{
+    width:100%; border-radius:2px; overflow:hidden; background:#e6dcc8;
+    display:flex; align-items:center; justify-content:center; position:relative;
+    min-height:60px;
+  }
+  .card-media img, .card-media video{width:100%; display:block; object-fit:cover;}
+  .card-media.audio-media{
+    aspect-ratio:1.4/1; background:linear-gradient(135deg,#efe4cd,#e2d2ac);
+    flex-direction:column; gap:8px;
+  }
+  .audio-wave{display:flex; gap:3px; align-items:flex-end; height:34px;}
+  .audio-wave span{width:3px; background:#b9945a; border-radius:2px;}
+
+  .card-date{font-family:var(--font-display); font-style:italic; font-size:13px; color:#8a6f3f; margin:9px 2px 3px;}
+  .card-text{
+    font-size:13.5px; line-height:1.5; margin:0 2px; color:#3a3120;
+    display:-webkit-box; -webkit-line-clamp:5; -webkit-box-orient:vertical; overflow:hidden;
+  }
+
+  .fab{
+    position:fixed; bottom:26px; right:22px; z-index:6;
+    width:56px; height:56px; border-radius:50%; border:none;
+    background:var(--gold); color:#1a1408; font-size:28px; font-weight:400;
+    box-shadow:0 10px 24px rgba(227,184,114,0.35);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .fab:active{transform:scale(0.92);}
+
+  .modal-overlay{
+    position:fixed; inset:0; background:rgba(6,8,20,0.72); backdrop-filter:blur(4px);
+    z-index:20; display:flex; align-items:flex-end; justify-content:center;
+  }
+  @media(min-width:640px){.modal-overlay{align-items:center;}}
+  .modal{
+    width:100%; max-width:480px; max-height:88vh; overflow-y:auto;
+    background:var(--bg-deep2); border-radius:22px 22px 0 0;
+    padding:22px 20px 28px; border:1px solid var(--glass-border); border-bottom:none;
+  }
+  @media(min-width:640px){.modal{border-radius:20px; border-bottom:1px solid var(--glass-border);}}
+  .modal h2{font-size:20px; margin-bottom:16px;}
+  .modal .field textarea{
+    width:100%; padding:12px 14px; border-radius:11px; min-height:90px; resize:vertical;
+    border:1px solid var(--glass-border); background:rgba(255,255,255,0.05);
+    color:var(--ink); font-size:14.5px; outline:none; line-height:1.5;
+  }
+  .file-drop{
+    border:1.5px dashed var(--glass-border); border-radius:14px; padding:18px;
+    text-align:center; color:var(--ink-dim); font-size:13.5px; position:relative; margin-bottom:14px;
+  }
+  .file-drop input{position:absolute; inset:0; opacity:0; cursor:pointer;}
+  .file-preview{margin-top:10px; max-height:160px; border-radius:10px; overflow:hidden;}
+  .file-preview img, .file-preview video{width:100%; display:block; max-height:160px; object-fit:cover;}
+  .modal-actions{display:flex; gap:10px; margin-top:8px;}
+  .btn-secondary{
+    flex:1; padding:12px; border-radius:11px; border:1px solid var(--glass-border);
+    background:transparent; color:var(--ink); font-size:14.5px;
+  }
+  .btn-danger{color:var(--danger); border-color:rgba(224,138,122,0.4);}
+  .hint{font-size:12px; color:var(--ink-dim); margin-top:-8px; margin-bottom:14px; line-height:1.5;}
+  .toast{
+    position:fixed; bottom:96px; left:50%; transform:translateX(-50%);
+    background:var(--glass); border:1px solid var(--glass-border); backdrop-filter:blur(10px);
+    padding:10px 18px; border-radius:30px; font-size:13.5px; z-index:30;
+    opacity:0; transition:opacity .25s ease; pointer-events:none;
+  }
+  .toast.show{opacity:1;}
+  .view-media{width:100%; border-radius:12px; overflow:hidden; margin-bottom:14px; background:#111633;}
+  .view-media img, .view-media video{width:100%; display:block; max-height:50vh; object-fit:contain; background:#000;}
+
+  @media (prefers-reduced-motion: reduce){ .card{transition:none;} }
+</style>
+</head>
+<body>
+<canvas id="stars"></canvas>
+<div class="app" id="app"></div>
+<div id="toast" class="toast"></div>
+
+<script>
+/* ================= Starfield background ================= */
+(function(){
+  const canvas = document.getElementById('stars');
+  const ctx = canvas.getContext('2d');
+  let w, h, stars = [], shooting = [];
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function resize(){
+    w = canvas.width = window.innerWidth;
+    h = canvas.height = window.innerHeight;
+    const count = Math.min(180, Math.floor((w*h)/9000));
+    stars = Array.from({length:count}, () => ({
+      x: Math.random()*w, y: Math.random()*h,
+      r: Math.random()*1.4+0.3,
+      phase: Math.random()*Math.PI*2,
+      speed: 0.4 + Math.random()*0.8
+    }));
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  function maybeSpawnShootingStar(){
+    if(Math.random() < 0.004 && shooting.length < 2){
+      const startX = Math.random()*w*0.6 + w*0.2;
+      shooting.push({x:startX, y: -10, vx: 3.5+Math.random()*2, vy: 2+Math.random()*1.5, life: 1});
+    }
+  }
+
+  let t = 0;
+  function draw(){
+    ctx.clearRect(0,0,w,h);
+    t += 0.02;
+    stars.forEach(s => {
+      const o = 0.35 + 0.65*Math.abs(Math.sin(t*s.speed + s.phase));
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(243,239,230,${o.toFixed(2)})`;
+      ctx.fill();
+    });
+    if(!reduceMotion){
+      maybeSpawnShootingStar();
+      shooting.forEach(s => {
+        ctx.save();
+        const grad = ctx.createLinearGradient(s.x, s.y, s.x - s.vx*14, s.y - s.vy*14);
+        grad.addColorStop(0, `rgba(227,184,114,${s.life})`);
+        grad.addColorStop(1, 'rgba(227,184,114,0)');
+        ctx.strokeStyle = grad;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(s.x, s.y);
+        ctx.lineTo(s.x - s.vx*14, s.y - s.vy*14);
+        ctx.stroke();
+        ctx.restore();
+        s.x += s.vx; s.y += s.vy; s.life -= 0.02;
+      });
+      shooting = shooting.filter(s => s.life > 0 && s.y < h+20);
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* ================= Local-only storage (IndexedDB + localStorage) ================= */
+/* Everything below stays on this device. No network calls, no external database. */
+const DB_NAME = 'keepsakeDB';
+const DB_VERSION = 1;
+const STORE = 'memories';
+const AUTH_KEY = 'keepsake-auth';        // localStorage: {hash}
+const SESSION_KEY = 'keepsake-session';  // localStorage: 'unlocked' or absent
+
+function openDB(){
+  return new Promise((resolve, reject) => {
+    if(!window.indexedDB){ reject(new Error('IndexedDB not available')); return; }
+    const req = indexedDB.open(DB_NAME, DB_VERSION);
+    req.onupgradeneeded = e => {
+      const db = e.target.result;
+      if(!db.objectStoreNames.contains(STORE)) db.createObjectStore(STORE, {keyPath:'id'});
+    };
+    req.onsuccess = e => resolve(e.target.result);
+    req.onerror = e => reject(e);
+  });
+}
+async function dbPut(entry){
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE, 'readwrite');
+    tx.objectStore(STORE).put(entry);
+    tx.oncomplete = () => resolve(true);
+    tx.onerror = e => reject(e);
+  });
+}
+async function dbDelete(id){
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE, 'readwrite');
+    tx.objectStore(STORE).delete(id);
+    tx.oncomplete = () => resolve(true);
+    tx.onerror = e => reject(e);
+  });
+}
+async function dbGetAll(){
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE, 'readonly');
+    const req = tx.objectStore(STORE).getAll();
+    req.onsuccess = () => resolve(req.result || []);
+    req.onerror = e => reject(e);
+  });
+}
+async function sha256(text){
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+/* ================= App state ================= */
+const app = document.getElementById('app');
+let memories = [];
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2200);
+}
+
+/* ================= Boot / lock flow ================= */
+function boot(){
+  const authRaw = localStorage.getItem(AUTH_KEY);
+  if(!authRaw){
+    renderCreatePassword();
+    return;
+  }
+  const sessionOk = localStorage.getItem(SESSION_KEY) === 'unlocked';
+  if(sessionOk){
+    bootMain();
+  }else{
+    renderEnterPassword();
+  }
+}
+
+function renderCreatePassword(){
+  app.innerHTML = `
+    <div class="lock-wrap">
+      <div class="lock-card">
+        <div class="lock-mark">keepsake</div>
+        <h1>Set a password</h1>
+        <p class="lock-sub">This locks your memories to just you, right here on this device. Choose something you'll remember.</p>
+        <div class="field"><label>New password</label><input type="password" id="p1" autocomplete="new-password" /></div>
+        <div class="field"><label>Confirm password</label><input type="password" id="p2" autocomplete="new-password" /></div>
+        <button class="btn-primary" id="createBtn">Create & continue</button>
+        <div class="err-msg" id="err"></div>
+      </div>
+    </div>`;
+  document.getElementById('createBtn').onclick = async () => {
+    const p1 = document.getElementById('p1').value;
+    const p2 = document.getElementById('p2').value;
+    const err = document.getElementById('err');
+    if(p1.length < 4){ err.textContent = 'Use at least 4 characters.'; return; }
+    if(p1 !== p2){ err.textContent = "Passwords don't match."; return; }
+    const hash = await sha256(p1);
+    localStorage.setItem(AUTH_KEY, JSON.stringify({hash}));
+    localStorage.setItem(SESSION_KEY, 'unlocked');
+    bootMain();
+  };
+}
+
+function renderEnterPassword(){
+  app.innerHTML = `
+    <div class="lock-wrap">
+      <div class="lock-card">
+        <div class="lock-mark">keepsake</div>
+        <h1>Welcome back</h1>
+        <p class="lock-sub">Enter your password to open your memories.</p>
+        <div class="field"><label>Password</label><input type="password" id="pw" autocomplete="current-password" /></div>
+        <button class="btn-primary" id="unlockBtn">Unlock</button>
+        <div class="err-msg" id="err"></div>
+      </div>
+    </div>`;
+  const tryUnlock = async () => {
+    const pw = document.getElementById('pw').value;
+    const err = document.getElementById('err');
+    const auth = JSON.parse(localStorage.getItem(AUTH_KEY));
+    const hash = await sha256(pw);
+    if(hash === auth.hash){
+      localStorage.setItem(SESSION_KEY, 'unlocked');
+      bootMain();
+    }else{
+      err.textContent = 'Incorrect password. Try again.';
+    }
+  };
+  document.getElementById('unlockBtn').onclick = tryUnlock;
+  document.getElementById('pw').addEventListener('keydown', e => { if(e.key === 'Enter') tryUnlock(); });
+}
+
+/* ================= Main app ================= */
+async function bootMain(){
+  app.innerHTML = `<div class="loading-state">Opening your memories...</div>`;
+  try{
+    memories = await dbGetAll();
+  }catch(e){
+    memories = [];
+  }
+  memories.sort((a,b) => new Date(b.date) - new Date(a.date));
+  renderMain();
+}
+
+function renderMain(){
+  app.innerHTML = `
+    <header>
+      <div class="wordmark">
+        <div class="lock-mark">keepsake</div>
+        <h1>Memories</h1>
+      </div>
+      <div class="header-actions">
+        <button class="icon-btn" id="lockAgainBtn" title="Lock">${iconLock()}</button>
+        <button class="icon-btn" id="settingsBtn" title="Settings">${iconGear()}</button>
+      </div>
+    </header>
+    <div class="grid-wrap">
+      ${memories.length === 0 ? `
+        <div class="empty-state">
+          <h2>Nothing here yet</h2>
+          <p>Tap the + below to pin your first photo, clip, voice note, or just a few words — whenever it happened.</p>
+        </div>` : `<div class="grid" id="grid"></div>`}
+    </div>
+    <button class="fab" id="fabBtn" title="Add memory">+</button>
+  `;
+  document.getElementById('fabBtn').onclick = openAddModal;
+  document.getElementById('settingsBtn').onclick = openSettingsModal;
+  document.getElementById('lockAgainBtn').onclick = () => {
+    localStorage.removeItem(SESSION_KEY);
+    renderEnterPassword();
+  };
+  if(memories.length) renderGrid();
+}
+
+function fmtDate(d){
+  const dt = new Date(d + 'T00:00:00');
+  return dt.toLocaleDateString(undefined, {month:'long', day:'numeric', year:'numeric'});
+}
+
+function renderGrid(){
+  const grid = document.getElementById('grid');
+  grid.innerHTML = memories.map(m => `
+    <div class="card" data-id="${m.id}">
+      ${m.mediaType ? `<div class="card-media">${mediaMarkup(m)}</div>` : ''}
+      <div class="card-date">${fmtDate(m.date)}</div>
+      ${m.text ? `<div class="card-text">${escapeHtml(m.text)}</div>` : ''}
+    </div>
+  `).join('');
+  grid.querySelectorAll('.card').forEach(el => {
+    el.onclick = () => openViewModal(el.dataset.id);
+  });
+}
+
+function mediaMarkup(m){
+  if(m.mediaType === 'image') return `<img src="${m.mediaData}" alt="memory photo" loading="lazy" />`;
+  if(m.mediaType === 'video') return `<video src="${m.mediaData}" muted playsinline preload="metadata"></video>`;
+  if(m.mediaType === 'audio') return `
+    <div class="card-media audio-media">
+      <div class="audio-wave">${Array.from({length:9}).map((_,i)=>`<span style="height:${8+Math.abs(Math.sin(i))*22}px"></span>`).join('')}</div>
+      <span style="font-size:12px;color:#8a6f3f;">voice memory</span>
+    </div>`;
+  return '';
+}
+
+function escapeHtml(s){
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+/* ================= Add modal ================= */
+function closeModal(){
+  const ov = document.querySelector('.modal-overlay');
+  if(ov) ov.remove();
+}
+
+function openAddModal(){
+  const today = new Date().toISOString().slice(0,10);
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML = `
+    <div class="modal">
+      <h2>New memory</h2>
+      <div class="field"><label>Date</label><input type="date" id="mDate" value="${today}" max="${today}" /></div>
+      <div class="field"><label>What happened</label><textarea id="mText" placeholder="A few words about this moment..."></textarea></div>
+      <div class="file-drop" id="dropZone">
+        <input type="file" id="mFile" accept="image/*,video/*,audio/*" />
+        <span id="dropLabel">Tap to add a photo, video, or audio clip (optional)</span>
+      </div>
+      <div class="hint">Everything is saved right on this device. Photos are compressed automatically for space; very long videos may be slow to store.</div>
+      <div class="file-preview" id="filePreview" style="display:none;"></div>
+      <div class="modal-actions">
+        <button class="btn-secondary" id="cancelBtn">Cancel</button>
+        <button class="btn-primary" id="saveBtn" style="flex:1;">Save memory</button>
+      </div>
+      <div class="err-msg" id="modalErr"></div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', e => { if(e.target === overlay) closeModal(); });
+  document.getElementById('cancelBtn').onclick = closeModal;
+
+  let pendingMedia = null;
+
+  document.getElementById('mFile').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    const err = document.getElementById('modalErr');
+    err.textContent = '';
+    if(!file) return;
+    document.getElementById('dropLabel').textContent = 'Processing...';
+    try{
+      if(file.type.startsWith('image/')){
+        const dataUrl = await compressImage(file);
+        pendingMedia = {type:'image', dataUrl};
+      } else if(file.type.startsWith('video/') || file.type.startsWith('audio/')){
+        const dataUrl = await fileToDataUrl(file);
+        pendingMedia = {type: file.type.startsWith('video/') ? 'video' : 'audio', dataUrl};
+      }
+      document.getElementById('dropLabel').textContent = 'Selected: ' + file.name;
+      const preview = document.getElementById('filePreview');
+      preview.style.display = 'block';
+      preview.innerHTML = pendingMedia.type === 'image'
+        ? `<img src="${pendingMedia.dataUrl}" />`
+        : pendingMedia.type === 'video'
+          ? `<video src="${pendingMedia.dataUrl}" controls muted></video>`
+          : `<audio src="${pendingMedia.dataUrl}" controls style="width:100%;"></audio>`;
+    }catch(err2){
+      err.textContent = "Couldn't process that file. Try a different one.";
+      document.getElementById('dropLabel').textContent = 'Tap to add a photo, video, or audio clip (optional)';
+    }
+  });
+
+  document.getElementById('saveBtn').onclick = async () => {
+    const date = document.getElementById('mDate').value;
+    const text = document.getElementById('mText').value.trim();
+    const err = document.getElementById('modalErr');
+    if(!date){ err.textContent = 'Pick a date for this memory.'; return; }
+    if(!text && !pendingMedia){ err.textContent = 'Add a few words or a file to save this.'; return; }
+
+    const id = Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+    const entry = {
+      id, date, text,
+      mediaType: pendingMedia ? pendingMedia.type : null,
+      mediaData: pendingMedia ? pendingMedia.dataUrl : null,
+      createdAt: Date.now()
+    };
+    try{
+      await dbPut(entry);
+    }catch(e){
+      err.textContent = 'Could not save — the file may be too large for your browser storage.';
+      return;
+    }
+    memories.unshift(entry);
+    memories.sort((a,b) => new Date(b.date) - new Date(a.date));
+    closeModal();
+    renderMain();
+    showToast('Memory saved.');
+  };
+}
+
+function fileToDataUrl(file){
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => resolve(r.result);
+    r.onerror = reject;
+    r.readAsDataURL(file);
+  });
+}
+
+function compressImage(file){
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const reader = new FileReader();
+    reader.onload = () => {
+      img.onload = () => {
+        const maxDim = 1100;
+        let {width, height} = img;
+        if(width > height && width > maxDim){ height = height*(maxDim/width); width = maxDim; }
+        else if(height > maxDim){ width = width*(maxDim/height); height = maxDim; }
+        const canvas = document.createElement('canvas');
+        canvas.width = width; canvas.height = height;
+        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', 0.75));
+      };
+      img.onerror = reject;
+      img.src = reader.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+/* ================= View / delete modal ================= */
+function openViewModal(id){
+  const entry = memories.find(m => m.id === id);
+  if(!entry) return;
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML = `
+    <div class="modal">
+      ${entry.mediaType ? `<div class="view-media">${
+        entry.mediaType === 'image' ? `<img src="${entry.mediaData}"/>` :
+        entry.mediaType === 'video' ? `<video src="${entry.mediaData}" controls playsinline></video>` :
+        `<div style="padding:24px;"><audio src="${entry.mediaData}" controls style="width:100%;"></audio></div>`
+      }</div>` : ''}
+      <div class="card-date" style="color:var(--gold);">${fmtDate(entry.date)}</div>
+      ${entry.text ? `<p style="line-height:1.6; font-size:15px; margin:10px 0 4px;">${escapeHtml(entry.text)}</p>` : ''}
+      <div class="modal-actions" style="margin-top:18px;">
+        <button class="btn-secondary btn-danger" id="delBtn">Delete</button>
+        <button class="btn-secondary" id="closeBtn" style="flex:1;">Close</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', e => { if(e.target === overlay) closeModal(); });
+  document.getElementById('closeBtn').onclick = closeModal;
+  document.getElementById('delBtn').onclick = async () => {
+    await dbDelete(id);
+    memories = memories.filter(m => m.id !== id);
+    closeModal();
+    renderMain();
+    showToast('Memory deleted.');
+  };
+}
+
+/* ================= Settings / change password ================= */
+function openSettingsModal(){
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML = `
+    <div class="modal">
+      <h2>Change password</h2>
+      <div class="field"><label>Current password</label><input type="password" id="curPw" /></div>
+      <div class="field"><label>New password</label><input type="password" id="newPw1" /></div>
+      <div class="field"><label>Confirm new password</label><input type="password" id="newPw2" /></div>
+      <div class="modal-actions">
+        <button class="btn-secondary" id="closeSettings">Cancel</button>
+        <button class="btn-primary" id="savePw" style="flex:1;">Update password</button>
+      </div>
+      <div class="err-msg" id="settingsErr"></div>
+      <div class="hint" style="margin-top:16px;">Your password and memories live only in this browser on this device — there's no account and nothing to recover if you clear your browser data, so choose one you won't forget.</div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', e => { if(e.target === overlay) closeModal(); });
+  document.getElementById('closeSettings').onclick = closeModal;
+  document.getElementById('savePw').onclick = async () => {
+    const cur = document.getElementById('curPw').value;
+    const n1 = document.getElementById('newPw1').value;
+    const n2 = document.getElementById('newPw2').value;
+    const err = document.getElementById('settingsErr');
+    const auth = JSON.parse(localStorage.getItem(AUTH_KEY));
+    const curHash = await sha256(cur);
+    if(curHash !== auth.hash){ err.textContent = 'Current password is incorrect.'; return; }
+    if(n1.length < 4){ err.textContent = 'New password should be at least 4 characters.'; return; }
+    if(n1 !== n2){ err.textContent = "New passwords don't match."; return; }
+    const newHash = await sha256(n1);
+    localStorage.setItem(AUTH_KEY, JSON.stringify({hash:newHash}));
+    closeModal();
+    showToast('Password updated.');
+  };
+}
+
+/* ================= Icons ================= */
+function iconGear(){
+  return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>`;
+}
+function iconLock(){
+  return `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>`;
+}
+
+/* ================= Boot ================= */
+boot();
+</script>
+</body>
+</html>
