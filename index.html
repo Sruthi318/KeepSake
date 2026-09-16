@@ -13,7 +13,7 @@
     --gold:#e3b872;
     --gold-dim:rgba(227,184,114,0.25);
     --paper:#f7f0e3;
-    --paper-shadow:rgba(10,10,30,0.55);
+    --paper-shadow:rgba(10,10,30,0.5);
     --danger:#e08a7a;
     --glass:rgba(255,255,255,0.06);
     --glass-border:rgba(255,255,255,0.14);
@@ -23,32 +23,15 @@
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;height:100%;}
   body{
-    font-family:var(--font-body);
-    color:var(--ink);
-    background:var(--bg-deep);
-    min-height:100vh;
-    overflow-x:hidden;
-    -webkit-tap-highlight-color:transparent;
+    font-family:var(--font-body); color:var(--ink); background:var(--bg-deep);
+    min-height:100vh; overflow-x:hidden; -webkit-tap-highlight-color:transparent;
   }
-  #stars{
-    position:fixed; inset:0; width:100%; height:100%;
-    background:radial-gradient(ellipse at 50% -10%, var(--bg-deep2), var(--bg-deep) 65%);
-    z-index:0;
-  }
+  #stars{position:fixed; inset:0; width:100%; height:100%;
+    background:radial-gradient(ellipse at 50% -10%, var(--bg-deep2), var(--bg-deep) 65%); z-index:0;}
+  #dayGlow{position:fixed; inset:0; z-index:0; pointer-events:none;
+    background:radial-gradient(ellipse 70% 55% at 50% 20%, var(--day-glow-color, rgba(227,184,114,0.14)), transparent 70%);
+    transition:background 1.1s ease;}
   .app{position:relative; z-index:1; min-height:100vh;}
-  #dayGlow{
-    position:fixed; inset:0; z-index:0; pointer-events:none;
-    background:radial-gradient(ellipse 70% 55% at 50% 20%, var(--day-glow-color, rgba(227,184,114,0.16)), transparent 70%);
-    transition:background 1.1s ease;
-  }
-  .day-divider{
-    column-span:all; display:flex; align-items:center; gap:10px;
-    margin:6px 4px 14px; color:var(--ink-dim); font-size:12.5px;
-  }
-  .day-divider .dot{width:8px; height:8px; border-radius:50%; background:var(--day-color, var(--gold)); flex-shrink:0;
-    box-shadow:0 0 10px var(--day-color, var(--gold));}
-  .day-divider .line{flex:1; height:1px; background:var(--glass-border);}
-  .card{border-top:3px solid var(--day-color, var(--gold));}
   h1,h2,h3{font-family:var(--font-display); font-weight:600; margin:0;}
   ::selection{background:var(--gold-dim);}
   button{font-family:inherit; cursor:pointer;}
@@ -56,50 +39,37 @@
   a{color:var(--gold);}
 
   .lock-wrap{min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px;}
-  .lock-card{
-    width:100%; max-width:360px;
-    background:var(--glass); border:1px solid var(--glass-border);
-    backdrop-filter:blur(14px); border-radius:20px;
-    padding:36px 28px 30px; text-align:center;
-    box-shadow:0 30px 60px rgba(0,0,0,0.35);
-  }
+  .lock-card{width:100%; max-width:360px; background:var(--glass); border:1px solid var(--glass-border);
+    backdrop-filter:blur(14px); border-radius:20px; padding:36px 28px 30px; text-align:center;
+    box-shadow:0 30px 60px rgba(0,0,0,0.35);}
   .lock-mark{font-size:15px; letter-spacing:0.02em; color:var(--gold); margin-bottom:6px; font-family:var(--font-display); font-style:italic;}
-  .lock-card h1{font-size:28px; margin-bottom:8px;}
+  .lock-card h1{font-size:26px; margin-bottom:8px;}
   .lock-sub{color:var(--ink-dim); font-size:14px; line-height:1.5; margin-bottom:26px;}
   .field{margin-bottom:14px; text-align:left;}
   .field label{display:block; font-size:12.5px; color:var(--ink-dim); margin-bottom:6px;}
-  .field input{
-    width:100%; padding:12px 14px; border-radius:11px;
-    border:1px solid var(--glass-border); background:rgba(255,255,255,0.05);
-    color:var(--ink); font-size:15px; outline:none;
-    transition:border-color .15s ease, background .15s ease;
-  }
+  .field input{width:100%; padding:12px 14px; border-radius:11px; border:1px solid var(--glass-border);
+    background:rgba(255,255,255,0.05); color:var(--ink); font-size:15px; outline:none;
+    transition:border-color .15s ease, background .15s ease;}
   .field input:focus{border-color:var(--gold); background:rgba(255,255,255,0.09);}
-  .btn-primary{
-    width:100%; padding:13px 14px; border-radius:11px; border:none;
-    background:var(--gold); color:#1a1408; font-weight:600; font-size:15px; margin-top:6px;
-  }
+  .btn-primary{width:100%; padding:13px 14px; border-radius:11px; border:none; background:var(--gold);
+    color:#1a1408; font-weight:600; font-size:15px; margin-top:6px;}
   .btn-primary:active{transform:scale(0.98);}
   .err-msg{color:var(--danger); font-size:13px; margin-top:12px; min-height:16px;}
 
-  header{
-    display:flex; align-items:center; justify-content:space-between;
-    padding:18px 20px 10px; position:sticky; top:0; z-index:5;
-    background:linear-gradient(var(--bg-deep) 55%, transparent);
-  }
-  .wordmark{display:flex; flex-direction:column; line-height:1.1;}
+  header{display:flex; align-items:center; justify-content:space-between; gap:8px;
+    padding:18px 16px 10px; position:sticky; top:0; z-index:5;
+    background:linear-gradient(var(--bg-deep) 55%, transparent);}
+  .wordmark{display:flex; flex-direction:column; line-height:1.1; overflow:hidden;}
   .wordmark .lock-mark{margin:0;}
-  .wordmark h1{font-size:22px;}
-  .icon-btn{
-    width:38px; height:38px; border-radius:50%; border:1px solid var(--glass-border);
+  .wordmark h1{font-size:20px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .icon-btn{width:38px; height:38px; border-radius:50%; border:1px solid var(--glass-border);
     background:var(--glass); display:flex; align-items:center; justify-content:center;
-    color:var(--ink); flex-shrink:0;
-  }
+    color:var(--ink); flex-shrink:0;}
   .icon-btn:active{transform:scale(0.94);}
-  .header-actions{display:flex; gap:8px;}
+  .header-actions{display:flex; gap:8px; flex-shrink:0;}
 
   .grid-wrap{padding:8px 14px 110px;}
-  .grid{column-count:1; column-gap:16px;}
+  .grid{column-count:1; column-gap:20px;}
   @media(min-width:560px){.grid{column-count:2;}}
   @media(min-width:900px){.grid{column-count:3;}}
   @media(min-width:1250px){.grid{column-count:4;}}
@@ -109,91 +79,124 @@
   .empty-state p{font-size:14px; line-height:1.6; max-width:280px; margin:0 auto;}
   .loading-state{text-align:center; padding:70px 20px; color:var(--ink-dim); font-size:14px;}
 
-  .card{
-    break-inside:avoid; margin-bottom:18px; display:block;
-    background:var(--paper); border-radius:3px 3px 2px 2px;
-    padding:10px 10px 14px; color:#2a2418;
+  .day-divider{column-span:all; display:flex; align-items:center; gap:10px;
+    margin:6px 4px 14px; color:var(--ink-dim); font-size:12.5px; scroll-margin-top:80px;}
+  .day-divider .dot{width:8px; height:8px; border-radius:50%; background:var(--day-color, var(--gold)); flex-shrink:0;
+    box-shadow:0 0 10px var(--day-color, var(--gold));}
+  .day-divider .line{flex:1; height:1px; background:var(--glass-border);}
+
+  .card{break-inside:avoid; margin-bottom:22px; display:block;
+    background:var(--paper); border-radius:20px; padding:9px 9px 14px; color:#2a2418;
     box-shadow:0 10px 22px var(--paper-shadow);
+    border-top:4px solid var(--day-color, var(--gold));
     transform:rotate(var(--tilt,0deg));
-    transition:transform .25s ease, box-shadow .25s ease;
-    cursor:pointer;
-  }
-  .card:nth-child(3n+1){--tilt:-1.4deg;}
-  .card:nth-child(3n+2){--tilt:1.1deg;}
-  .card:nth-child(3n){--tilt:-0.6deg;}
+    transition:transform .25s ease, box-shadow .25s ease; cursor:pointer;}
+  .card:nth-child(3n+1){--tilt:-1deg;}
+  .card:nth-child(3n+2){--tilt:0.8deg;}
+  .card:nth-child(3n){--tilt:-0.4deg;}
   .card:active{transform:rotate(0deg) scale(0.98);}
   .card:hover{transform:rotate(0deg); box-shadow:0 16px 30px var(--paper-shadow);}
 
-  .card-media{
-    width:100%; border-radius:2px; overflow:hidden; background:#e6dcc8;
-    display:flex; align-items:center; justify-content:center; position:relative;
-    min-height:60px;
-  }
-  .card-media img, .card-media video{width:100%; display:block; object-fit:cover;}
-  .card-media.audio-media{
-    aspect-ratio:1.4/1; background:linear-gradient(135deg,#efe4cd,#e2d2ac);
-    flex-direction:column; gap:8px;
-  }
+  .card-media{width:100%; max-height:220px; border-radius:14px; overflow:hidden; background:#e6dcc8;
+    display:flex; align-items:center; justify-content:center; position:relative; min-height:60px;}
+  .card-media img, .card-media video{width:100%; max-height:220px; display:block; object-fit:cover;}
+  .card-media.audio-media{aspect-ratio:1.6/1; max-height:none; background:linear-gradient(135deg,#efe4cd,#e2d2ac);
+    flex-direction:column; gap:8px;}
   .audio-wave{display:flex; gap:3px; align-items:flex-end; height:34px;}
   .audio-wave span{width:3px; background:#b9945a; border-radius:2px;}
 
-  .card-date{font-family:var(--font-display); font-style:italic; font-size:13px; color:#8a6f3f; margin:9px 2px 3px;}
-  .card-text{
-    font-size:13.5px; line-height:1.5; margin:0 2px; color:#3a3120;
-    display:-webkit-box; -webkit-line-clamp:5; -webkit-box-orient:vertical; overflow:hidden;
-  }
+  .card-date{font-family:var(--font-display); font-style:italic; font-size:12.5px; color:#8a6f3f; margin:9px 3px 3px;}
+  .card-text{font-size:13.5px; line-height:1.5; margin:0 3px; color:#3a3120;
+    display:-webkit-box; -webkit-line-clamp:5; -webkit-box-orient:vertical; overflow:hidden;}
 
-  .fab{
-    position:fixed; bottom:26px; right:22px; z-index:6;
-    width:56px; height:56px; border-radius:50%; border:none;
-    background:var(--gold); color:#1a1408; font-size:28px; font-weight:400;
-    box-shadow:0 10px 24px rgba(227,184,114,0.35);
-    display:flex; align-items:center; justify-content:center;
-  }
+  .season-banner{column-span:all; border-radius:20px; padding:20px 16px; margin:8px 4px 20px;
+    text-align:center; position:relative; overflow:hidden; color:#3a2c14;}
+  .season-banner .season-emoji{font-size:36px; display:block; margin-bottom:4px;}
+  .season-banner .season-label{font-family:var(--font-display); font-style:italic; font-size:14px;}
+  .season-particles{position:absolute; inset:0; overflow:hidden; pointer-events:none;}
+  .season-particle{position:absolute; top:-24px; font-size:16px; animation:seasonFall linear infinite;}
+  @keyframes seasonFall{ to{ transform:translateY(180px) rotate(220deg); opacity:0; } }
+  .season-dec{background:linear-gradient(135deg,#e4eef8,#cfe0ef);}
+  .season-jan{background:linear-gradient(135deg,#ffe6b8,#ffcf8a);}
+  .season-feb{background:linear-gradient(135deg,#dfe6f0,#c7d5ea);}
+  .season-mar{background:linear-gradient(135deg,#ffd9e8,#ffc2d9);}
+  .season-apr{background:linear-gradient(135deg,#c8f0e0,#fff2b8);}
+  .season-may{background:linear-gradient(135deg,#ffe0e8,#ffd2a3);}
+  .season-jun{background:linear-gradient(135deg,#ffe9c2,#ffd199);}
+  .season-jul{background:linear-gradient(135deg,#dcecd2,#c3ddb0);}
+  .season-aug{background:linear-gradient(135deg,#f0dcb8,#dfb377);}
+  .season-sep{background:linear-gradient(135deg,#ffe0c2,#ffc79a);}
+  .season-oct{background:linear-gradient(135deg,#ffe3b0,#f3c178);}
+  .season-nov{background:linear-gradient(135deg,#ffe6b3,#ffb84d);}
+
+  .fab{position:fixed; bottom:26px; right:22px; z-index:6; width:56px; height:56px; border-radius:50%;
+    border:none; background:var(--gold); color:#1a1408; font-size:28px; font-weight:400;
+    box-shadow:0 10px 24px rgba(227,184,114,0.35); display:flex; align-items:center; justify-content:center;}
   .fab:active{transform:scale(0.92);}
 
-  .modal-overlay{
-    position:fixed; inset:0; background:rgba(6,8,20,0.72); backdrop-filter:blur(4px);
-    z-index:20; display:flex; align-items:flex-end; justify-content:center;
-  }
+  .modal-overlay{position:fixed; inset:0; background:rgba(6,8,20,0.72); backdrop-filter:blur(4px);
+    z-index:30; display:flex; align-items:flex-end; justify-content:center;}
   @media(min-width:640px){.modal-overlay{align-items:center;}}
-  .modal{
-    width:100%; max-width:480px; max-height:88vh; overflow-y:auto;
-    background:var(--bg-deep2); border-radius:22px 22px 0 0;
-    padding:22px 20px 28px; border:1px solid var(--glass-border); border-bottom:none;
-  }
+  .modal{width:100%; max-width:480px; max-height:88vh; overflow-y:auto; background:var(--bg-deep2);
+    border-radius:22px 22px 0 0; padding:22px 20px 28px; border:1px solid var(--glass-border); border-bottom:none;}
   @media(min-width:640px){.modal{border-radius:20px; border-bottom:1px solid var(--glass-border);}}
   .modal h2{font-size:20px; margin-bottom:16px;}
-  .modal .field textarea{
-    width:100%; padding:12px 14px; border-radius:11px; min-height:90px; resize:vertical;
-    border:1px solid var(--glass-border); background:rgba(255,255,255,0.05);
-    color:var(--ink); font-size:14.5px; outline:none; line-height:1.5;
-  }
-  .file-drop{
-    border:1.5px dashed var(--glass-border); border-radius:14px; padding:18px;
-    text-align:center; color:var(--ink-dim); font-size:13.5px; position:relative; margin-bottom:14px;
-  }
+  .modal .field textarea{width:100%; padding:12px 14px; border-radius:11px; min-height:90px; resize:vertical;
+    border:1px solid var(--glass-border); background:rgba(255,255,255,0.05); color:var(--ink);
+    font-size:14.5px; outline:none; line-height:1.5;}
+  .file-drop{border:1.5px dashed var(--glass-border); border-radius:14px; padding:18px; text-align:center;
+    color:var(--ink-dim); font-size:13.5px; position:relative; margin-bottom:14px;}
   .file-drop input{position:absolute; inset:0; opacity:0; cursor:pointer;}
   .file-preview{margin-top:10px; max-height:160px; border-radius:10px; overflow:hidden;}
   .file-preview img, .file-preview video{width:100%; display:block; max-height:160px; object-fit:cover;}
   .modal-actions{display:flex; gap:10px; margin-top:8px;}
-  .btn-secondary{
-    flex:1; padding:12px; border-radius:11px; border:1px solid var(--glass-border);
-    background:transparent; color:var(--ink); font-size:14.5px;
-  }
+  .btn-secondary{flex:1; padding:12px; border-radius:11px; border:1px solid var(--glass-border);
+    background:transparent; color:var(--ink); font-size:14.5px;}
   .btn-danger{color:var(--danger); border-color:rgba(224,138,122,0.4);}
   .hint{font-size:12px; color:var(--ink-dim); margin-top:-8px; margin-bottom:14px; line-height:1.5;}
-  .toast{
-    position:fixed; bottom:96px; left:50%; transform:translateX(-50%);
-    background:var(--glass); border:1px solid var(--glass-border); backdrop-filter:blur(10px);
-    padding:10px 18px; border-radius:30px; font-size:13.5px; z-index:30;
-    opacity:0; transition:opacity .25s ease; pointer-events:none;
-  }
+  .toast{position:fixed; bottom:96px; left:50%; transform:translateX(-50%); background:var(--glass);
+    border:1px solid var(--glass-border); backdrop-filter:blur(10px); padding:10px 18px; border-radius:30px;
+    font-size:13.5px; z-index:40; opacity:0; transition:opacity .25s ease; pointer-events:none;}
   .toast.show{opacity:1;}
-  .view-media{width:100%; border-radius:12px; overflow:hidden; margin-bottom:14px; background:#111633;}
+  .view-media{width:100%; border-radius:14px; overflow:hidden; margin-bottom:14px; background:#111633;}
   .view-media img, .view-media video{width:100%; display:block; max-height:50vh; object-fit:contain; background:#000;}
 
-  @media (prefers-reduced-motion: reduce){ .card{transition:none;} }
+  /* ---------- Drawer / timeline tree ---------- */
+  .drawer-overlay{position:fixed; inset:0; background:rgba(6,8,20,0.55); z-index:24;
+    opacity:0; pointer-events:none; transition:opacity .25s ease;}
+  .drawer-overlay.open{opacity:1; pointer-events:auto;}
+  .drawer{position:fixed; top:0; left:0; bottom:0; width:84%; max-width:300px; background:var(--bg-deep2);
+    border-right:1px solid var(--glass-border); z-index:25; transform:translateX(-100%);
+    transition:transform .3s ease; padding:18px 14px 40px; overflow-y:auto;}
+  .drawer.open{transform:translateX(0);}
+  .drawer-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;}
+  .drawer-head h2{font-size:18px;}
+  details.tree-year{margin-bottom:4px;}
+  details.tree-year > summary{cursor:pointer; font-family:var(--font-display); font-size:15px;
+    padding:9px 6px; list-style:none; display:flex; align-items:center; justify-content:space-between;}
+  details.tree-year > summary::-webkit-details-marker{display:none;}
+  details.tree-year > summary::after{content:'\\25B8'; color:var(--ink-dim); font-size:11px; transition:transform .2s ease;}
+  details.tree-year[open] > summary::after{transform:rotate(90deg);}
+  details.tree-month{margin-left:8px;}
+  details.tree-month > summary{cursor:pointer; font-size:13.5px; padding:7px 6px; color:var(--ink-dim);
+    list-style:none; display:flex; align-items:center; justify-content:space-between;}
+  details.tree-month > summary::-webkit-details-marker{display:none;}
+  details.tree-month > summary::after{content:'\\25B8'; font-size:10px; transition:transform .2s ease;}
+  details.tree-month[open] > summary::after{transform:rotate(90deg);}
+  .tree-day{display:flex; align-items:center; gap:6px; padding:7px 4px 7px 18px; font-size:12.8px; border-radius:8px;}
+  .tree-day:hover{background:rgba(255,255,255,0.05);}
+  .tree-day .day-label{flex:1; cursor:pointer; color:var(--ink); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .tree-day .mood{font-size:13px; flex-shrink:0;}
+  .tree-day .edit-pencil{opacity:0.55; padding:3px; flex-shrink:0; background:none; border:none; color:var(--ink);}
+  .tree-day .edit-pencil:active{opacity:1;}
+  .drawer-empty{color:var(--ink-dim); font-size:13px; line-height:1.6;}
+
+  .mood-picker{display:flex; gap:10px; margin-bottom:18px; justify-content:center;}
+  .mood-btn{width:46px; height:46px; border-radius:50%; border:1.5px solid var(--glass-border);
+    background:rgba(255,255,255,0.04); font-size:20px; display:flex; align-items:center; justify-content:center;}
+  .mood-btn.selected{border-color:var(--gold); background:var(--gold-dim);}
+
+  @media (prefers-reduced-motion: reduce){ .card{transition:none;} .season-particle{animation:none; display:none;} }
 </style>
 </head>
 <body>
@@ -209,54 +212,39 @@
   const ctx = canvas.getContext('2d');
   let w, h, stars = [], shooting = [];
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
   function resize(){
-    w = canvas.width = window.innerWidth;
-    h = canvas.height = window.innerHeight;
+    w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight;
     const count = Math.min(180, Math.floor((w*h)/9000));
     stars = Array.from({length:count}, () => ({
-      x: Math.random()*w, y: Math.random()*h,
-      r: Math.random()*1.4+0.3,
-      phase: Math.random()*Math.PI*2,
-      speed: 0.4 + Math.random()*0.8
+      x: Math.random()*w, y: Math.random()*h, r: Math.random()*1.4+0.3,
+      phase: Math.random()*Math.PI*2, speed: 0.4 + Math.random()*0.8
     }));
   }
   window.addEventListener('resize', resize);
   resize();
-
   function maybeSpawnShootingStar(){
     if(Math.random() < 0.004 && shooting.length < 2){
       const startX = Math.random()*w*0.6 + w*0.2;
       shooting.push({x:startX, y: -10, vx: 3.5+Math.random()*2, vy: 2+Math.random()*1.5, life: 1});
     }
   }
-
   let t = 0;
   function draw(){
-    ctx.clearRect(0,0,w,h);
-    t += 0.02;
+    ctx.clearRect(0,0,w,h); t += 0.02;
     stars.forEach(s => {
       const o = 0.35 + 0.65*Math.abs(Math.sin(t*s.speed + s.phase));
-      ctx.beginPath();
-      ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
-      ctx.fillStyle = `rgba(243,239,230,${o.toFixed(2)})`;
-      ctx.fill();
+      ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(243,239,230,${o.toFixed(2)})`; ctx.fill();
     });
     if(!reduceMotion){
       maybeSpawnShootingStar();
       shooting.forEach(s => {
         ctx.save();
         const grad = ctx.createLinearGradient(s.x, s.y, s.x - s.vx*14, s.y - s.vy*14);
-        grad.addColorStop(0, `rgba(227,184,114,${s.life})`);
-        grad.addColorStop(1, 'rgba(227,184,114,0)');
-        ctx.strokeStyle = grad;
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.moveTo(s.x, s.y);
-        ctx.lineTo(s.x - s.vx*14, s.y - s.vy*14);
-        ctx.stroke();
-        ctx.restore();
-        s.x += s.vx; s.y += s.vy; s.life -= 0.02;
+        grad.addColorStop(0, `rgba(227,184,114,${s.life})`); grad.addColorStop(1, 'rgba(227,184,114,0)');
+        ctx.strokeStyle = grad; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(s.x, s.y); ctx.lineTo(s.x - s.vx*14, s.y - s.vy*14); ctx.stroke();
+        ctx.restore(); s.x += s.vx; s.y += s.vy; s.life -= 0.02;
       });
       shooting = shooting.filter(s => s.life > 0 && s.y < h+20);
     }
@@ -266,12 +254,12 @@
 })();
 
 /* ================= Local-only storage (IndexedDB + localStorage) ================= */
-/* Everything below stays on this device. No network calls, no external database. */
 const DB_NAME = 'keepsakeDB';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 const STORE = 'memories';
-const AUTH_KEY = 'keepsake-auth';        // localStorage: {hash}
-const SESSION_KEY = 'keepsake-session';  // localStorage: 'unlocked' or absent
+const META_STORE = 'dayMeta';
+const AUTH_KEY = 'keepsake-auth';
+const SESSION_KEY = 'keepsake-session';
 
 function openDB(){
   return new Promise((resolve, reject) => {
@@ -280,6 +268,7 @@ function openDB(){
     req.onupgradeneeded = e => {
       const db = e.target.result;
       if(!db.objectStoreNames.contains(STORE)) db.createObjectStore(STORE, {keyPath:'id'});
+      if(!db.objectStoreNames.contains(META_STORE)) db.createObjectStore(META_STORE, {keyPath:'date'});
     };
     req.onsuccess = e => resolve(e.target.result);
     req.onerror = e => reject(e);
@@ -290,8 +279,7 @@ async function dbPut(entry){
   return new Promise((resolve, reject) => {
     const tx = db.transaction(STORE, 'readwrite');
     tx.objectStore(STORE).put(entry);
-    tx.oncomplete = () => resolve(true);
-    tx.onerror = e => reject(e);
+    tx.oncomplete = () => resolve(true); tx.onerror = e => reject(e);
   });
 }
 async function dbDelete(id){
@@ -299,8 +287,7 @@ async function dbDelete(id){
   return new Promise((resolve, reject) => {
     const tx = db.transaction(STORE, 'readwrite');
     tx.objectStore(STORE).delete(id);
-    tx.oncomplete = () => resolve(true);
-    tx.onerror = e => reject(e);
+    tx.oncomplete = () => resolve(true); tx.onerror = e => reject(e);
   });
 }
 async function dbGetAll(){
@@ -308,8 +295,23 @@ async function dbGetAll(){
   return new Promise((resolve, reject) => {
     const tx = db.transaction(STORE, 'readonly');
     const req = tx.objectStore(STORE).getAll();
-    req.onsuccess = () => resolve(req.result || []);
-    req.onerror = e => reject(e);
+    req.onsuccess = () => resolve(req.result || []); req.onerror = e => reject(e);
+  });
+}
+async function dbPutMeta(entry){
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(META_STORE, 'readwrite');
+    tx.objectStore(META_STORE).put(entry);
+    tx.oncomplete = () => resolve(true); tx.onerror = e => reject(e);
+  });
+}
+async function dbGetAllMeta(){
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(META_STORE, 'readonly');
+    const req = tx.objectStore(META_STORE).getAll();
+    req.onsuccess = () => resolve(req.result || []); req.onerror = e => reject(e);
   });
 }
 async function sha256(text){
@@ -320,27 +322,34 @@ async function sha256(text){
 /* ================= App state ================= */
 const app = document.getElementById('app');
 let memories = [];
+let dayMetaMap = {};
 
 function showToast(msg){
   const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
+  t.textContent = msg; t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'), 2200);
+}
+function escapeHtml(s){
+  const d = document.createElement('div'); d.textContent = s; return d.innerHTML;
+}
+function fmtDate(d){
+  const dt = new Date(d + 'T00:00:00');
+  return dt.toLocaleDateString(undefined, {month:'long', day:'numeric', year:'numeric'});
+}
+function fmtDateShort(d){
+  const dt = new Date(d + 'T00:00:00');
+  return dt.toLocaleDateString(undefined, {month:'short', day:'numeric'});
+}
+function moodEmoji(key){
+  return {star:'\u2b50', crown:'\ud83d\udc51', heart:'\u2764\ufe0f', trophy:'\ud83c\udfc6'}[key] || '';
 }
 
 /* ================= Boot / lock flow ================= */
 function boot(){
   const authRaw = localStorage.getItem(AUTH_KEY);
-  if(!authRaw){
-    renderCreatePassword();
-    return;
-  }
+  if(!authRaw){ renderCreatePassword(); return; }
   const sessionOk = localStorage.getItem(SESSION_KEY) === 'unlocked';
-  if(sessionOk){
-    bootMain();
-  }else{
-    renderEnterPassword();
-  }
+  if(sessionOk) bootMain(); else renderEnterPassword();
 }
 
 function renderCreatePassword(){
@@ -386,12 +395,8 @@ function renderEnterPassword(){
     const err = document.getElementById('err');
     const auth = JSON.parse(localStorage.getItem(AUTH_KEY));
     const hash = await sha256(pw);
-    if(hash === auth.hash){
-      localStorage.setItem(SESSION_KEY, 'unlocked');
-      bootMain();
-    }else{
-      err.textContent = 'Incorrect password. Try again.';
-    }
+    if(hash === auth.hash){ localStorage.setItem(SESSION_KEY, 'unlocked'); bootMain(); }
+    else{ err.textContent = 'Incorrect password. Try again.'; }
   };
   document.getElementById('unlockBtn').onclick = tryUnlock;
   document.getElementById('pw').addEventListener('keydown', e => { if(e.key === 'Enter') tryUnlock(); });
@@ -402,16 +407,18 @@ async function bootMain(){
   app.innerHTML = `<div class="loading-state">Opening your memories...</div>`;
   try{
     memories = await dbGetAll();
-  }catch(e){
-    memories = [];
-  }
-  memories.sort((a,b) => new Date(b.date) - new Date(a.date));
+    const metaList = await dbGetAllMeta();
+    dayMetaMap = {};
+    metaList.forEach(m => dayMetaMap[m.date] = m);
+  }catch(e){ memories = []; dayMetaMap = {}; }
+  memories.sort((a,b) => new Date(a.date) - new Date(b.date)); // chronological, oldest first
   renderMain();
 }
 
 function renderMain(){
   app.innerHTML = `
     <header>
+      <button class="icon-btn" id="menuBtn" title="Timeline">${iconMenu()}</button>
       <div class="wordmark">
         <div class="lock-mark">keepsake</div>
         <h1>Sruthi's Odyssey</h1>
@@ -429,74 +436,99 @@ function renderMain(){
         </div>` : `<div class="grid" id="grid"></div>`}
     </div>
     <button class="fab" id="fabBtn" title="Add memory">+</button>
+    <div class="drawer-overlay" id="drawerOverlay"></div>
+    <div class="drawer" id="drawer">
+      <div class="drawer-head"><h2>Timeline</h2><button class="icon-btn" id="closeDrawerBtn">${iconClose()}</button></div>
+      <div id="drawerTree"></div>
+    </div>
   `;
   document.getElementById('fabBtn').onclick = openAddModal;
   document.getElementById('settingsBtn').onclick = openSettingsModal;
-  document.getElementById('lockAgainBtn').onclick = () => {
-    localStorage.removeItem(SESSION_KEY);
-    renderEnterPassword();
-  };
+  document.getElementById('lockAgainBtn').onclick = () => { localStorage.removeItem(SESSION_KEY); renderEnterPassword(); };
+  document.getElementById('menuBtn').onclick = openDrawer;
+  document.getElementById('closeDrawerBtn').onclick = closeDrawer;
+  document.getElementById('drawerOverlay').onclick = closeDrawer;
   if(memories.length) renderGrid();
+  renderDrawer();
 }
 
-function fmtDate(d){
-  const dt = new Date(d + 'T00:00:00');
-  return dt.toLocaleDateString(undefined, {month:'long', day:'numeric', year:'numeric'});
+/* ================= Seasonal banners ================= */
+const SEASONS = {
+  0:  {emoji:'\ud83c\udf3e', particles:['\ud83c\udf3e','\ud83e\uddd1\u200d\ud83c\udf3e','\ud83c\udf89'], label:'Pongal vibes', cls:'season-jan'},
+  1:  {emoji:'\ud83c\udfaf', particles:['\ud83c\udfaf','\ud83d\udcd8','\u270f\ufe0f'], label:'The grind pays off', cls:'season-feb'},
+  2:  {emoji:'\ud83c\udf82', particles:['\ud83c\udf88','\ud83c\udf89','\ud83c\udf82'], label:'Birthday month', cls:'season-mar'},
+  3:  {emoji:'\ud83c\udf49', particles:['\ud83c\udf49','\ud83c\udfd6\ufe0f','\u2600\ufe0f'], label:'Summer & watermelon', cls:'season-apr'},
+  4:  {emoji:'\ud83c\udf34', particles:['\u2600\ufe0f','\ud83c\udfd6\ufe0f','\ud83c\udf34'], label:'Summer vacation', cls:'season-may'},
+  5:  {emoji:'\u2600\ufe0f', particles:['\u2600\ufe0f','\ud83c\udf67','\ud83c\udfd6\ufe0f'], label:'Summer vacation', cls:'season-jun'},
+  6:  {emoji:'\ud83c\udf92', particles:['\ud83d\udcda','\u270f\ufe0f','\ud83c\udf92'], label:'Back to college', cls:'season-jul'},
+  7:  {emoji:'\ud83c\udf42', particles:['\ud83c\udf41','\ud83c\udf42'], label:'Autumn air', cls:'season-aug'},
+  8:  {emoji:'\ud83d\udc18', particles:['\ud83d\udc18','\ud83c\udf3a','\ud83c\udf89'], label:'Ganesh Chaturthi', cls:'season-sep'},
+  9:  {emoji:'\ud83c\udff9', particles:['\ud83c\udff9','\ud83e\udea6','\ud83c\udf89'], label:'Dasara vibes', cls:'season-oct'},
+  10: {emoji:'\ud83e\udd6f', particles:['\ud83e\udd6f','\u2728','\ud83c\udf86'], label:'Diwali lights', cls:'season-nov'},
+  11: {emoji:'\ud83c\udf84', particles:['\u2744\ufe0f','\u2744','\u2728'], label:'A snowy December', cls:'season-dec'}
+};
+function seasonBannerHtml(season, year){
+  const particles = Array.from({length:10}).map((_,i)=>{
+    const emoji = season.particles[i % season.particles.length];
+    const left = Math.random()*94;
+    const duration = (4 + Math.random()*4).toFixed(2);
+    const delay = (Math.random()*4).toFixed(2);
+    return `<span class="season-particle" style="left:${left}%; animation-duration:${duration}s; animation-delay:${delay}s;">${emoji}</span>`;
+  }).join('');
+  return `<div class="season-banner ${season.cls}">
+    <div class="season-particles">${particles}</div>
+    <span class="season-emoji">${season.emoji}</span>
+    <span class="season-label">${season.label} &middot; ${year}</span>
+  </div>`;
 }
 
+/* ================= Day color ================= */
 const DAY_PALETTE = ['#e3b872','#d98b96','#8fa8e0','#9bb98f','#b39ddb','#7fc2c0','#e2917a','#e0b34f'];
 function dayColor(dateStr){
   let hash = 0;
   for(let i=0;i<dateStr.length;i++) hash = (hash*31 + dateStr.charCodeAt(i)) >>> 0;
   return DAY_PALETTE[hash % DAY_PALETTE.length];
 }
+function hexToRgba(hex, alpha){
+  const n = parseInt(hex.slice(1), 16);
+  const r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+  return `rgba(${r},${g},${b},${alpha})`;
+}
 
+/* ================= Grid rendering ================= */
 function renderGrid(){
   const grid = document.getElementById('grid');
-  let html = '';
-  let lastDate = null;
+  let htmlOut = '';
+  let lastDayKey = null;
+  let lastMonthKey = null;
   memories.forEach(m => {
-    const color = dayColor(m.date);
-    if(m.date !== lastDate){
-      html += `<div class="day-divider" data-date="${m.date}" style="--day-color:${color}">
-        <span class="dot"></span><span>${fmtDate(m.date)}</span><span class="line"></span>
-      </div>`;
-      lastDate = m.date;
+    const d = new Date(m.date + 'T00:00:00');
+    const monthKey = d.getFullYear() + '-' + d.getMonth();
+    if(monthKey !== lastMonthKey){
+      const season = SEASONS[d.getMonth()];
+      if(season) htmlOut += seasonBannerHtml(season, d.getFullYear());
+      lastMonthKey = monthKey;
     }
-    html += `
+    const color = dayColor(m.date);
+    if(m.date !== lastDayKey){
+      const meta = dayMetaMap[m.date] || {};
+      const mood = meta.mood ? moodEmoji(meta.mood) + ' ' : '';
+      const labelText = meta.label ? `${escapeHtml(meta.label)} &middot; ${fmtDate(m.date)}` : fmtDate(m.date);
+      htmlOut += `<div class="day-divider" id="day-${m.date}" data-date="${m.date}" style="--day-color:${color}">
+        <span class="dot"></span><span>${mood}${labelText}</span><span class="line"></span>
+      </div>`;
+      lastDayKey = m.date;
+    }
+    htmlOut += `
       <div class="card" data-id="${m.id}" style="--day-color:${color}">
         ${m.mediaType ? `<div class="card-media">${mediaMarkup(m)}</div>` : ''}
         <div class="card-date">${fmtDate(m.date)}</div>
         ${m.text ? `<div class="card-text">${escapeHtml(m.text)}</div>` : ''}
       </div>`;
   });
-  grid.innerHTML = html;
-  grid.querySelectorAll('.card').forEach(el => {
-    el.onclick = () => openViewModal(el.dataset.id);
-  });
+  grid.innerHTML = htmlOut;
+  grid.querySelectorAll('.card').forEach(el => { el.onclick = () => openViewModal(el.dataset.id); });
   setupDayGlowTracking();
-}
-
-function setupDayGlowTracking(){
-  const dividers = document.querySelectorAll('.day-divider');
-  if(!dividers.length || !('IntersectionObserver' in window)) return;
-  const glow = document.getElementById('dayGlow');
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if(entry.isIntersecting){
-        const color = dayColor(entry.target.dataset.date);
-        const rgb = hexToRgba(color, 0.16);
-        glow.style.setProperty('--day-glow-color', rgb);
-      }
-    });
-  }, {rootMargin:'-40% 0px -40% 0px', threshold:0});
-  dividers.forEach(d => observer.observe(d));
-}
-
-function hexToRgba(hex, alpha){
-  const n = parseInt(hex.slice(1), 16);
-  const r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
-  return `rgba(${r},${g},${b},${alpha})`;
 }
 
 function mediaMarkup(m){
@@ -510,17 +542,130 @@ function mediaMarkup(m){
   return '';
 }
 
-function escapeHtml(s){
-  const d = document.createElement('div');
-  d.textContent = s;
-  return d.innerHTML;
+function setupDayGlowTracking(){
+  const dividers = document.querySelectorAll('.day-divider');
+  if(!dividers.length || !('IntersectionObserver' in window)) return;
+  const glow = document.getElementById('dayGlow');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting){
+        const rgb = hexToRgba(dayColor(entry.target.dataset.date), 0.14);
+        glow.style.setProperty('--day-glow-color', rgb);
+      }
+    });
+  }, {rootMargin:'-40% 0px -40% 0px', threshold:0});
+  dividers.forEach(d => observer.observe(d));
+}
+
+/* ================= Drawer / timeline tree ================= */
+function openDrawer(){ document.getElementById('drawer').classList.add('open'); document.getElementById('drawerOverlay').classList.add('open'); }
+function closeDrawer(){ document.getElementById('drawer').classList.remove('open'); document.getElementById('drawerOverlay').classList.remove('open'); }
+
+function buildDateTree(){
+  const tree = {};
+  const uniqueDates = [...new Set(memories.map(m => m.date))];
+  uniqueDates.forEach(dateStr => {
+    const d = new Date(dateStr + 'T00:00:00');
+    const y = d.getFullYear(), mo = d.getMonth();
+    tree[y] = tree[y] || {};
+    tree[y][mo] = tree[y][mo] || [];
+    tree[y][mo].push(dateStr);
+  });
+  Object.values(tree).forEach(yearObj => Object.values(yearObj).forEach(arr => arr.sort()));
+  return tree;
+}
+
+const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+function renderDrawer(){
+  const container = document.getElementById('drawerTree');
+  const tree = buildDateTree();
+  const years = Object.keys(tree).map(Number).sort((a,b) => b - a);
+  if(years.length === 0){
+    container.innerHTML = `<p class="drawer-empty">No memories yet — add one and it'll show up here, organized by year and month.</p>`;
+    return;
+  }
+  let html = '';
+  years.forEach(y => {
+    html += `<details class="tree-year" open><summary>${y}</summary>`;
+    const months = Object.keys(tree[y]).map(Number).sort((a,b) => a - b);
+    months.forEach(mo => {
+      html += `<details class="tree-month"><summary>${MONTH_NAMES[mo]}</summary>`;
+      tree[y][mo].forEach(dateStr => {
+        const meta = dayMetaMap[dateStr] || {};
+        const mood = meta.mood ? moodEmoji(meta.mood) : '';
+        const label = meta.label ? escapeHtml(meta.label) : fmtDateShort(dateStr);
+        html += `<div class="tree-day">
+          <span class="mood">${mood}</span>
+          <span class="day-label" data-date="${dateStr}">${label}</span>
+          <button class="edit-pencil" data-date="${dateStr}" title="Mood & rename">${iconPencilSmall()}</button>
+        </div>`;
+      });
+      html += `</details>`;
+    });
+    html += `</details>`;
+  });
+  container.innerHTML = html;
+  container.querySelectorAll('.day-label').forEach(el => { el.onclick = () => jumpToDay(el.dataset.date); });
+  container.querySelectorAll('.edit-pencil').forEach(el => {
+    el.onclick = (e) => { e.stopPropagation(); openDayMetaModal(el.dataset.date); };
+  });
+}
+
+function jumpToDay(dateStr){
+  closeDrawer();
+  setTimeout(() => {
+    const el = document.getElementById('day-' + dateStr);
+    if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
+  }, 300);
+}
+
+function openDayMetaModal(dateStr){
+  const meta = dayMetaMap[dateStr] || {};
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  const moods = [['star','\u2b50'],['crown','\ud83d\udc51'],['heart','\u2764\ufe0f'],['trophy','\ud83c\udfc6']];
+  overlay.innerHTML = `
+    <div class="modal">
+      <h2>${fmtDate(dateStr)}</h2>
+      <div class="field"><label>Mark this day</label>
+        <div class="mood-picker">
+          ${moods.map(([key,emoji]) => `<button type="button" class="mood-btn ${meta.mood===key?'selected':''}" data-mood="${key}">${emoji}</button>`).join('')}
+        </div>
+      </div>
+      <div class="field"><label>Rename this day (optional)</label>
+        <input type="text" id="dayLabelInput" placeholder="e.g. Best day ever" value="${meta.label ? escapeHtml(meta.label) : ''}" />
+      </div>
+      <div class="modal-actions">
+        <button class="btn-secondary" id="cancelMetaBtn">Cancel</button>
+        <button class="btn-primary" id="saveMetaBtn" style="flex:1;">Save</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+  let selectedMood = meta.mood || null;
+  overlay.querySelectorAll('.mood-btn').forEach(btn => {
+    btn.onclick = () => {
+      if(selectedMood === btn.dataset.mood){ selectedMood = null; }
+      else{ selectedMood = btn.dataset.mood; }
+      overlay.querySelectorAll('.mood-btn').forEach(b => b.classList.toggle('selected', b.dataset.mood === selectedMood));
+    };
+  });
+  overlay.addEventListener('click', e => { if(e.target === overlay) overlay.remove(); });
+  document.getElementById('cancelMetaBtn').onclick = () => overlay.remove();
+  document.getElementById('saveMetaBtn').onclick = async () => {
+    const label = document.getElementById('dayLabelInput').value.trim();
+    const entry = {date: dateStr, mood: selectedMood, label: label || null};
+    await dbPutMeta(entry);
+    dayMetaMap[dateStr] = entry;
+    overlay.remove();
+    renderGrid();
+    renderDrawer();
+    showToast('Day updated.');
+  };
 }
 
 /* ================= Add modal ================= */
-function closeModal(){
-  const ov = document.querySelector('.modal-overlay');
-  if(ov) ov.remove();
-}
+function closeModal(){ const ov = document.querySelector('.modal-overlay'); if(ov) ov.remove(); }
 
 function openAddModal(){
   const today = new Date().toISOString().slice(0,10);
@@ -584,7 +729,6 @@ function openAddModal(){
     const err = document.getElementById('modalErr');
     if(!date){ err.textContent = 'Pick a date for this memory.'; return; }
     if(!text && !pendingMedia){ err.textContent = 'Add a few words or a file to save this.'; return; }
-
     const id = Date.now().toString(36) + Math.random().toString(36).slice(2,7);
     const entry = {
       id, date, text,
@@ -592,14 +736,10 @@ function openAddModal(){
       mediaData: pendingMedia ? pendingMedia.dataUrl : null,
       createdAt: Date.now()
     };
-    try{
-      await dbPut(entry);
-    }catch(e){
-      err.textContent = 'Could not save — the file may be too large for your browser storage.';
-      return;
-    }
-    memories.unshift(entry);
-    memories.sort((a,b) => new Date(b.date) - new Date(a.date));
+    try{ await dbPut(entry); }
+    catch(e){ err.textContent = 'Could not save — the file may be too large for your browser storage.'; return; }
+    memories.push(entry);
+    memories.sort((a,b) => new Date(a.date) - new Date(b.date));
     closeModal();
     renderMain();
     showToast('Memory saved.');
@@ -609,12 +749,9 @@ function openAddModal(){
 function fileToDataUrl(file){
   return new Promise((resolve, reject) => {
     const r = new FileReader();
-    r.onload = () => resolve(r.result);
-    r.onerror = reject;
-    r.readAsDataURL(file);
+    r.onload = () => resolve(r.result); r.onerror = reject; r.readAsDataURL(file);
   });
 }
-
 function compressImage(file){
   return new Promise((resolve, reject) => {
     const img = new Image();
@@ -630,11 +767,9 @@ function compressImage(file){
         canvas.getContext('2d').drawImage(img, 0, 0, width, height);
         resolve(canvas.toDataURL('image/jpeg', 0.75));
       };
-      img.onerror = reject;
-      img.src = reader.result;
+      img.onerror = reject; img.src = reader.result;
     };
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
+    reader.onerror = reject; reader.readAsDataURL(file);
   });
 }
 
@@ -715,6 +850,15 @@ function iconGear(){
 }
 function iconLock(){
   return `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>`;
+}
+function iconMenu(){
+  return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="14" y2="17"/></svg>`;
+}
+function iconClose(){
+  return `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg>`;
+}
+function iconPencilSmall(){
+  return `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>`;
 }
 
 /* ================= Boot ================= */
