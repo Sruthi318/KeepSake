@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
 <title>Sruthi's Odyssey</title>
 <style>
   :root{
@@ -162,8 +162,9 @@
     border:1px solid var(--glass-border); backdrop-filter:blur(10px); padding:10px 18px; border-radius:30px;
     font-size:13.5px; z-index:40; opacity:0; transition:opacity .25s ease; pointer-events:none;}
   .toast.show{opacity:1;}
-  .view-media{width:100%; border-radius:14px; overflow:hidden; margin-bottom:14px; background:#111633;}
-  .view-media img, .view-media video{width:100%; display:block; max-height:50vh; object-fit:contain; background:#000;}
+  .view-media{width:100%; height:50vh; border-radius:14px; overflow:hidden; margin-bottom:14px; background:#111633; position:relative; touch-action:none;}
+  .view-media img, .view-media video{width:100%; height:100%; display:block; object-fit:contain; background:#000;}
+  .view-media img{transform-origin:center center; will-change:transform;}
 
   /* ---------- Drawer / timeline tree ---------- */
   .drawer-overlay{position:fixed; inset:0; background:rgba(6,8,20,0.55); z-index:24;
@@ -787,6 +788,53 @@ function compressImage(file){
 }
 
 /* ================= View / delete modal ================= */
+function setupImageZoom(stage, img){
+  let scale = 1, startDist = 0, startScale = 1;
+  let tx = 0, ty = 0, startX = 0, startY = 0, panning = false, lastTap = 0;
+
+  function dist(a, b){ return Math.hypot(b.clientX - a.clientX, b.clientY - a.clientY); }
+  function apply(smooth){
+    img.style.transition = smooth ? 'transform .2s ease-out' : 'none';
+    img.style.transform = `translate(${tx}px,${ty}px) scale(${scale})`;
+  }
+
+  stage.addEventListener('touchstart', e => {
+    if(e.touches.length === 2){
+      startDist = dist(e.touches[0], e.touches[1]);
+      startScale = scale;
+    }else if(e.touches.length === 1 && scale > 1){
+      panning = true;
+      startX = e.touches[0].clientX - tx;
+      startY = e.touches[0].clientY - ty;
+    }
+  }, {passive:true});
+
+  stage.addEventListener('touchmove', e => {
+    if(e.touches.length === 2){
+      e.preventDefault();
+      scale = Math.min(4, Math.max(1, startScale * (dist(e.touches[0], e.touches[1]) / startDist)));
+      apply(false);
+    }else if(panning && e.touches.length === 1){
+      e.preventDefault();
+      tx = e.touches[0].clientX - startX;
+      ty = e.touches[0].clientY - startY;
+      apply(false);
+    }
+  }, {passive:false});
+
+  stage.addEventListener('touchend', e => {
+    panning = false;
+    if(scale <= 1){ scale = 1; tx = 0; ty = 0; }
+    apply(true);
+    const now = Date.now();
+    if(e.touches.length === 0 && now - lastTap < 300){
+      if(scale > 1){ scale = 1; tx = 0; ty = 0; } else { scale = 2.2; }
+      apply(true);
+    }
+    lastTap = now;
+  });
+}
+
 function openViewModal(id){
   const entry = memories.find(m => m.id === id);
   if(!entry) return;
@@ -810,6 +858,11 @@ function openViewModal(id){
   document.body.appendChild(overlay);
   overlay.addEventListener('click', e => { if(e.target === overlay) closeModal(); });
   document.getElementById('closeBtn').onclick = closeModal;
+  if(entry.mediaType === 'image'){
+    const stage = overlay.querySelector('.view-media');
+    const img = stage.querySelector('img');
+    setupImageZoom(stage, img);
+  }
   document.getElementById('delBtn').onclick = async () => {
     await dbDelete(id);
     memories = memories.filter(m => m.id !== id);
